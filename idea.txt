@@ -1,0 +1,5 @@
+From http://ycombinator.com/ideas.html:
+
+22. A web-based Excel/database hybrid. People often use Excel as a lightweight database. I suspect there's an opportunity to create the program such users wish existed, and that there are new things you could do if it were web-based. Like make it easier to get data into it, through forms or scraping.
+
+Don't make it feel like a database. That frightens people. The question to ask is: how much can I let people do without defining structure? You want the database equivalent of a language that makes its easy to keep data in linked lists. (Which means you probably want to write it in one.) 
