@@ -1,0 +1,12 @@
+{% extends "template.html" %}
+{% from "form.html" import form_macro %}
+
+{% block title %}
+  Edit
+{% endblock %}
+
+
+{% block body %}
+  <h1>Edit</h1>
+  {{ form_macro(f) }}
+{% endblock %}

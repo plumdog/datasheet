@@ -2,8 +2,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for, abo
 from flask.ext.login import LoginManager, login_user, current_user, logout_user, login_required, login_url
 from .models import db, User
 from .forms import LoginForm
-from .db_functions import get_all_tables, get_table_obj, engine, run_sql
-from .data_types import data_factory
+from .db_functions import get_all_tables, get_table_obj, run_sql
 
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_table import Table as HTMLTable, Col, LinkCol
@@ -67,22 +66,9 @@ def app_factory(**kwargs):
     @app.route('/all-tables/')
     def all_tables():
         class TableTable(HTMLTable):
-            name = LinkCol('Name', 'table', attr='name', url_kwargs=dict(table_name='name'))
+            name = LinkCol('Name', 'data_bp.view', attr='name', url_kwargs=dict(table='name'))
         t = TableTable(get_all_tables(app.config['SQLALCHEMY_DATABASE_URI']))
-        return t.__html__()
-
-    @app.route('/table/<string:table_name>/')
-    def table(table_name):
-        table_obj = get_table_obj(app.config['SQLALCHEMY_DATABASE_URI'], table_name)
-        q = table_obj.select()
-        out = list(run_sql(q, app.config['SQLALCHEMY_DATABASE_URI'], as_text=False))
-
-        html_table = HTMLTable(out)
-        for c in table_obj.columns:
-            d = data_factory(sql_type=str(c.type))
-            html_table._cols[c.name] = d.col(c.name.title())
-
-        return html_table.__html__()
+        return render_template('all_tables.html', t=t)
 
     # use: http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/automap.html
 
@@ -90,14 +76,24 @@ def app_factory(**kwargs):
     @app.route('/create/')
     def create():
         run_sql(
-            ('CREATE TABLE test ('
+            ('CREATE TABLE %s ('
              'id INTEGER NOT NULL AUTO_INCREMENT, '
              'name VARCHAR(100), '
              'PRIMARY KEY (id)'
              ');'),
-            app.config['SQLALCHEMY_DATABASE_URI']
-        )
-        return redirect(url_for('index'))
+            app.config['SQLALCHEMY_DATABASE_URI'],
+            ('test',))
 
+        return redirect(url_for('all_tables'))
+
+    @app.route('/delete/')
+    def delete():
+        run_sql(
+            'DROP TABLE %s;', app.config['SQLALCHEMY_DATABASE_URI'], ('test',))
+
+        return redirect(url_for('all_tables'))
+
+    from .data_bp import bp_factory as data_bp_factory
+    app.register_blueprint(data_bp_factory(), url_prefix='/data')
 
     return app
