@@ -22,17 +22,16 @@ def engine(connection_str):
 
 def run_sql(sql, connection_str, args={}, as_text=True):
     if as_text:
-        
         sql = text(sql % args)
-
     conn = engine(connection_str).connect()
     out = conn.execute(sql)
     return out
 
+
 def session(connection_str):
-    
     Session = sessionmaker(bind=engine(connection_str))
     return Session()
+
 
 def table_query(connection_str, table):
     return session(connection_str).query(table)

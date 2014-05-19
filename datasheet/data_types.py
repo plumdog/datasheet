@@ -1,6 +1,7 @@
 from flask_table import Col, DateCol, DatetimeCol
 from wtforms import StringField, DateField, IntegerField, DateTimeField
 
+
 def data_factory(val=None, sql_type=None):
     if sql_type.startswith('INTEGER'):
         return IntegerData(val)
@@ -8,9 +9,9 @@ def data_factory(val=None, sql_type=None):
         return DateData(val)
     elif sql_type == 'DATETIME':
         return DatetimeData(val)
-    #sql_type.startswith('VARCHAR'):
     else:
         return StringData(val)
+
 
 class DataType(object):
     col = Col
@@ -20,15 +21,19 @@ class DataType(object):
     def __init__(self, val):
         self.val = val
 
+
 class IntegerData(DataType):
     field = IntegerField
+
 
 class StringData(DataType):
     pass
 
+
 class DateData(DataType):
     col = DateCol
     field = DateField
+
 
 class DatetimeData(DataType):
     col = DatetimeCol

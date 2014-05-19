@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, abort
-from flask.ext.login import LoginManager, login_user, current_user, logout_user, login_required, login_url
+from flask import (Flask, render_template, request, redirect, flash,
+                   url_for, abort)
+from flask.ext.login import (LoginManager, login_user, current_user,
+                             logout_user, login_required, login_url)
 from .models import db, User
 from .forms import LoginForm
 from .db_functions import get_all_tables, get_table_obj, run_sql
@@ -9,18 +11,18 @@ from flask_table import Table as HTMLTable, Col, LinkCol
 
 import config_combined
 
+
 def string_isinstance(obj, cls_name):
-    return cls_name in [type_.__name__ for type_ in obj.__class__.__bases__] + [type(obj).__name__]
+    return (cls_name in [type_.__name__ for type_ in obj.__class__.__bases__]
+            + [type(obj).__name__])
+
 
 def app_factory(**kwargs):
     app = Flask(__name__)
     app.config.from_object(config_combined)
     db.init_app(app)
-
     DebugToolbarExtension(app)
-
     app.add_template_global(string_isinstance, name='string_isinstance')
-
     login_manager = LoginManager(app)
 
     @login_manager.user_loader
@@ -36,7 +38,7 @@ def app_factory(**kwargs):
         form = LoginForm(request.form)
         if form.validate_on_submit():
             if (form.username.data == app.config['ADMIN_USERNAME'] and
-                form.password.data == app.config['ADMIN_PASSWORD']):
+                    form.password.data == app.config['ADMIN_PASSWORD']):
                 user = User()
                 login_user(user)
                 return redirect(url_for('index'))
@@ -66,7 +68,8 @@ def app_factory(**kwargs):
     @app.route('/all-tables/')
     def all_tables():
         class TableTable(HTMLTable):
-            name = LinkCol('Name', 'data_bp.view', attr='name', url_kwargs=dict(table='name'))
+            name = LinkCol('Name', 'data_bp.view', attr='name',
+                           url_kwargs=dict(table='name'))
         t = TableTable(get_all_tables(app.config['SQLALCHEMY_DATABASE_URI']))
         return render_template('all_tables.html', t=t)
 
