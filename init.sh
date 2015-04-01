@@ -7,6 +7,6 @@ function error() {
 }
 
 
-virtualenv --python=python3.4 . || error "Unable to create virtualenv."
+virtualenv --python=python3.3 . || error "Unable to create virtualenv."
 ./bin/pip install -r dependencies.txt || error "Unable to install pip dependencies."
 mysql -u root -p < mysql_init.sql || error "Unable to create MySQL database and user."

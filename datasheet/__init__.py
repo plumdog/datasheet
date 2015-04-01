@@ -70,6 +70,8 @@ def app_factory(**kwargs):
         class TableTable(HTMLTable):
             name = LinkCol('Name', 'data_bp.view', attr='name',
                            url_kwargs=dict(table='name'))
+            add_col = LinkCol('Add Col', 'table_bp.add_col',
+                              url_kwargs=dict(table='name'))
         t = TableTable(get_all_tables(app.config['SQLALCHEMY_DATABASE_URI']))
         return render_template('all_tables.html', t=t)
 
@@ -78,14 +80,16 @@ def app_factory(**kwargs):
     ## db manipulations
     @app.route('/create/')
     def create():
-        run_sql(
-            ('CREATE TABLE %s ('
-             'id INTEGER NOT NULL AUTO_INCREMENT, '
-             'name VARCHAR(100), '
-             'PRIMARY KEY (id)'
-             ');'),
-            app.config['SQLALCHEMY_DATABASE_URI'],
-            ('test',))
+        from .data_types import str_data_factory
+        from .sql import create
+
+        col_options = [('name', 'string'), ('date', 'date'), ('description', 'string')]
+        cols = [(name, str_data_factory(t)) for name, t in col_options]
+
+        name = 'test2'
+        sql = create(name, cols)
+
+        run_sql(sql, app.config['SQLALCHEMY_DATABASE_URI'])
 
         return redirect(url_for('all_tables'))
 
@@ -98,5 +102,8 @@ def app_factory(**kwargs):
 
     from .data_bp import bp_factory as data_bp_factory
     app.register_blueprint(data_bp_factory(), url_prefix='/data')
+
+    from .table_bp import bp_factory as table_bp_factory
+    app.register_blueprint(table_bp_factory(), url_prefix='/table')
 
     return app

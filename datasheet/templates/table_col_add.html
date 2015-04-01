@@ -1,0 +1,12 @@
+{% extends "template.html" %}
+{% from "form.html" import form_macro %}
+
+{% block title %}
+  Add
+{% endblock %}
+
+
+{% block body %}
+  <h1>Add Column to {{ table_name }}</h1>
+  {{ form_macro(form) }}
+{% endblock %}
